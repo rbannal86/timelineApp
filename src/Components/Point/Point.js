@@ -1,6 +1,18 @@
+import { useState, useRef } from "react";
+import ReactDOM from "react-dom";
+import { useDrag } from "react-dnd";
+import { ItemTypes } from "../../Service/dndItemTypes";
+
 import "./Point.css";
 
 export default function Point(props) {
+  const [{ isDragging }, drag] = useDrag({
+    item: { type: ItemTypes.POINT },
+    collect: (monitor) => ({
+      isDragging: !!monitor.isDragging(),
+    }),
+  });
+
   let styleObj = {
     position: "absolute",
     top: props.canvasY * props.relativeY,
@@ -9,27 +21,16 @@ export default function Point(props) {
     height: "20px",
     marginTop: "-10px",
     marginLeft: "-10px",
-  };
-
-  const handleDrag = () => {
-    setTimeout(() => {
-      console.log("dragging");
-    }, 1000);
+    opacity: isDragging ? 0.5 : 1,
   };
 
   return (
     <button
-      onMouseDown={() => {
-        handleDrag();
-      }}
-      // onMou
-      // onTouchStart={() => {
-      //   setTimeout(() => {
-      //     console.log("dragging");
-      //   }, 2000);
-      // }}
+      ref={drag}
       className={"point_main"}
       style={styleObj}
+      id={"point" + props.index}
+      onMouseOver={() => props.setMovingPoint(props.index)}
     />
   );
 }

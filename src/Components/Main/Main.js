@@ -1,50 +1,40 @@
 import { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
+import { useDrop } from "react-dnd";
 import Point from "../Point/Point";
 
 import "./Main.css";
+import { ItemTypes } from "../../Service/dndItemTypes";
 
 export default function Main() {
   const [points, setPoints] = useState([]);
   const [canvasUpdated, setCanvasUpdated] = useState(false);
   const [canvasX, setCanvasX] = useState();
   const [canvasY, setCanvasY] = useState();
-  // const [previousPathLength, setPreviousPathLength] = useState();
-  // const [pathUpdated, setPathUpdated] = useState(false);
+  const [movingPoint, setMovingPoint] = useState();
 
   const canvasMain = useRef(null);
 
   useEffect(() => {
     const setContainerDimensions = () => {
-      const container = ReactDOM.findDOMNode(
-        canvasMain.current
-      ).getBoundingClientRect();
-      setCanvasX(container.width);
-      setCanvasY(container.height);
+      setTimeout(() => {
+        const container = ReactDOM.findDOMNode(
+          canvasMain.current
+        ).getBoundingClientRect();
+        setCanvasX(container.width);
+        setCanvasY(container.height);
+      }, 500);
     };
 
     window.addEventListener("resize", setContainerDimensions);
     if (!canvasX && !canvasY) setContainerDimensions();
   }, [canvasX, canvasY]);
 
-  // useEffect(() => {
-  //   if (document.getElementById("main_path") && pathUpdated) {
-  //     setPreviousPathLength(
-  //       document.getElementById("main_path")
-  //     ).getTotalLength();
-  //     setPathUpdated(false);
-  //   }
-  // }, [pathUpdated]);
-
   const addPoint = (e) => {
-    // const previousLength = document
-    //   .getElementById("main_path")
-    //   .getTotalLength();
-
     let newPoints = [...points];
     const area = document.getElementById("main_canvas").getBoundingClientRect();
     const relativeY = e.clientY / area.height;
-    const relativeX = (e.clientX - area.left) / area.width;
+    const relativeX = e.clientX / area.width;
 
     newPoints.push({
       relativeX,
@@ -52,12 +42,6 @@ export default function Main() {
     });
     setPoints(newPoints);
     setCanvasUpdated(!canvasUpdated);
-    // drawLine(previousLength);
-  };
-
-  const drawLine = (previousLength) => {
-    console.log(previousLength);
-    console.log(document.getElementById("main_path").getTotalLength());
   };
 
   const renderPaths = () => {
@@ -103,7 +87,9 @@ export default function Main() {
           canvasY={canvasY}
           relativeX={point.relativeX}
           relativeY={point.relativeY}
+          index={index}
           key={index}
+          setMovingPoint={setMovingPoint}
         />
       );
     });
@@ -111,39 +97,54 @@ export default function Main() {
 
   const showPath = () => {
     if (document.getElementById("main_path")) {
+      let time = (points.length / (points.length + 5)) * 10;
+
       const path = document.getElementById("main_path");
       const length = path.getTotalLength();
-      console.log(path.style.strokeDasharray);
-      console.log(path.style.strokeDashoffset);
+
       path.style.transition = path.style.WebkitTransition = "none";
       path.style.strokeDasharray = length + " " + length;
       path.style.strokeDashoffset = length;
       path.getBoundingClientRect();
-      path.style.transition = path.style.WebkitTransition =
-        "stroke-dashoffset 5s ease-in-out";
+      path.style.transition = path.style.WebkitTransition = `stroke-dashoffset ${time}s ease-in-out`;
       path.style.strokeDashoffset = "0";
       setTimeout(() => {
         path.style.transition = path.style.WebkitTransition = "none";
         path.style.strokeDasharray = null;
         path.style.strokeDashoffset = null;
-      }, 5000);
+      }, time * 1000);
     }
   };
 
+  const [, drop] = useDrop({
+    accept: ItemTypes.POINT,
+    drop: (item, monitor) => {
+      updatePointPosition(monitor.getDifferenceFromInitialOffset());
+    },
+    collect: (monitor) => ({ isOver: !!monitor.isOver() }),
+  });
+
+  const updatePointPosition = (difference) => {
+    let newPoints = [...points];
+    const area = document.getElementById("main_canvas").getBoundingClientRect();
+    let initialX = points[movingPoint].relativeX * area.width;
+    let initialY = points[movingPoint].relativeY * area.height;
+    let x = initialX + difference.x;
+    let y = initialY + difference.y;
+    const relativeY = y / area.height;
+    const relativeX = x / area.width;
+
+    newPoints[movingPoint].relativeX = relativeX;
+    newPoints[movingPoint].relativeY = relativeY;
+
+    setPoints(newPoints);
+    setCanvasUpdated(!canvasUpdated);
+  };
+
   return (
-    <div className={"main_main"}>
+    <div className={"main_main"} ref={drop}>
       <div className={"main_utilities"}>
-        <button
-          onClick={() => {
-            showPath();
-            // setTimeout(() => {
-            //   const path = document.getElementById("main_path");
-            //   path.style.transition = path.style.WebkitTransition = "none";
-            // }, [5000]);
-          }}
-        >
-          Show Path
-        </button>
+        <button onClick={() => showPath()}>Show Path</button>
       </div>
       <svg
         ref={canvasMain}
