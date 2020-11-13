@@ -37,12 +37,14 @@ export default function Main() {
   // }, [pathUpdated]);
 
   const addPoint = (e) => {
+    // const previousLength = document
+    //   .getElementById("main_path")
+    //   .getTotalLength();
+
     let newPoints = [...points];
     const area = document.getElementById("main_canvas").getBoundingClientRect();
     const relativeY = e.clientY / area.height;
     const relativeX = (e.clientX - area.left) / area.width;
-
-    console.log(relativeX, relativeY);
 
     newPoints.push({
       relativeX,
@@ -50,15 +52,15 @@ export default function Main() {
     });
     setPoints(newPoints);
     setCanvasUpdated(!canvasUpdated);
+    // drawLine(previousLength);
+  };
+
+  const drawLine = (previousLength) => {
+    console.log(previousLength);
+    console.log(document.getElementById("main_path").getTotalLength());
   };
 
   const renderPaths = () => {
-    let previousPathLength = 0;
-    if (document.getElementById("main_path"))
-      previousPathLength = document
-        .getElementById("main_path")
-        .getTotalLength();
-    console.log(previousPathLength);
     if (points.length > 1) {
       let x1 = points[0].relativeX * canvasX;
       let y1 = points[0].relativeY * canvasY;
@@ -75,11 +77,20 @@ export default function Main() {
         for (let i = 2; i < points.length; i++) {
           let x = points[i].relativeX * canvasX;
           let y = points[i].relativeY * canvasY;
-          svgCurve = svgCurve + `T ${x} ${y}`;
+          let cx = (points[i - 1].relativeX * canvasX + x) * 0.5;
+          let cy = (points[i - 1].relativeY * canvasY + y) * 0.5;
+          svgCurve = svgCurve + `S ${cx} ${cy} ${x} ${y}`;
         }
       }
       return (
-        <path d={svgCurve} stroke="black" fill="transparent" id={"main_path"} />
+        <path
+          d={svgCurve}
+          markerEnd={"X"}
+          stroke="black"
+          fill="transparent"
+          id={"main_path"}
+          strokeWidth={"2"}
+        />
       );
     } else return null;
   };
@@ -98,15 +109,48 @@ export default function Main() {
     });
   };
 
+  const showPath = () => {
+    if (document.getElementById("main_path")) {
+      const path = document.getElementById("main_path");
+      const length = path.getTotalLength();
+      console.log(path.style.strokeDasharray);
+      console.log(path.style.strokeDashoffset);
+      path.style.transition = path.style.WebkitTransition = "none";
+      path.style.strokeDasharray = length + " " + length;
+      path.style.strokeDashoffset = length;
+      path.getBoundingClientRect();
+      path.style.transition = path.style.WebkitTransition =
+        "stroke-dashoffset 5s ease-in-out";
+      path.style.strokeDashoffset = "0";
+      setTimeout(() => {
+        path.style.transition = path.style.WebkitTransition = "none";
+        path.style.strokeDasharray = null;
+        path.style.strokeDashoffset = null;
+      }, 5000);
+    }
+  };
+
   return (
     <div className={"main_main"}>
+      <div className={"main_utilities"}>
+        <button
+          onClick={() => {
+            showPath();
+            // setTimeout(() => {
+            //   const path = document.getElementById("main_path");
+            //   path.style.transition = path.style.WebkitTransition = "none";
+            // }, [5000]);
+          }}
+        >
+          Show Path
+        </button>
+      </div>
       <svg
         ref={canvasMain}
         id={"main_canvas"}
         onClick={(e) => {
           addPoint(e);
         }}
-        style={{ height: "100%", width: "100%" }}
       >
         {renderPaths()}
       </svg>

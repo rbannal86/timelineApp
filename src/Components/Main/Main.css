@@ -1,8 +1,15 @@
 .main_main {
   position: relative;
   height: 100%;
-  width: 75%;
+  width: 100%;
   margin-right: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+}
+
+.main_utilities {
+  position: absolute;
 }
 
 #main_canvas {
