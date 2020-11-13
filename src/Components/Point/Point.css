@@ -1,0 +1,7 @@
+.point_main {
+  width: 10px;
+  height: 10px;
+  background-color: lime;
+  border-radius: 50%;
+  border: none;
+}
