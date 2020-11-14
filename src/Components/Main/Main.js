@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import { useDrop } from "react-dnd";
 import Point from "../Point/Point";
 import Utilities from "../Utilities/Utilities";
+import PointDetails from "../PointDetails/PointDetails";
 
 import "./Main.css";
 import { ItemTypes } from "../../Service/dndItemTypes";
@@ -15,6 +16,9 @@ export default function Main() {
   const [movingPoint, setMovingPoint] = useState();
   const [screenLock, setScreenLock] = useState(false);
   const [previousMove, setPreviousMove] = useState({});
+  const [openPointDetails, setOpenPointDetails] = useState(false);
+  const [fadeOutDetails, setFadeOutDetails] = useState(false);
+  const [buttonFocus, setButtonFocus] = useState(false);
 
   const canvasMain = useRef(null);
 
@@ -103,6 +107,12 @@ export default function Main() {
           key={index}
           setMovingPoint={setMovingPoint}
           updatePointPosition={updatePointPosition}
+          setOpenPointDetails={setOpenPointDetails}
+          setFadeOutDetails={setFadeOutDetails}
+          fadeOutDetails={fadeOutDetails}
+          movingPoint={movingPoint}
+          setButtonFocus={setButtonFocus}
+          buttonFocus={buttonFocus}
         />
       );
     });
@@ -149,6 +159,9 @@ export default function Main() {
 
   const [, drop] = useDrop({
     accept: ItemTypes.POINT,
+    hover: () => {
+      if (fadeOutDetails) setFadeOutDetails(false);
+    },
     drop: (item, monitor) => {
       updatePointPosition(monitor.getDifferenceFromInitialOffset());
     },
@@ -187,11 +200,27 @@ export default function Main() {
         screenLock={screenLock}
         undoLastMove={undoLastMove}
       />
+      {openPointDetails ? (
+        <PointDetails
+          point={points[movingPoint]}
+          canvasX={canvasX}
+          canvasY={canvasY}
+          setOpenPointDetails={setOpenPointDetails}
+          openPointDetails={openPointDetails}
+          fadeOutDetails={fadeOutDetails}
+          setFadeOutDetails={setFadeOutDetails}
+        />
+      ) : null}
       <svg
         ref={canvasMain}
         id={"main_canvas"}
         onClick={(e) => {
           addPoint(e);
+        }}
+        onMouseEnter={() => {
+          setFadeOutDetails(false);
+          setButtonFocus(false);
+          window.clearTimeout("showDetails");
         }}
       >
         {renderPaths()}

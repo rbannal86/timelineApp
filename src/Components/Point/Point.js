@@ -28,13 +28,36 @@ export default function Point(props) {
     opacity: isDragging ? 0.5 : 1,
   };
 
+  if (props.index === props.movingPoint && props.buttonFocus) {
+    styleObj = {
+      ...styleObj,
+      width: "30px",
+      height: "30px",
+      marginTop: "-15px",
+      marginLeft: "-15px",
+      backgroundColor: "red",
+    };
+  }
+
+  // let openDetailsTimeout = setTimeout(
+  //   () => props.setOpenPointDetails(false),
+  //   1000
+  // );
+
+  // let stopOpenDetailsTimeout = () => window.clearTimeout(openDetailsTimeout);
+
   return (
     <button
       ref={drag}
       className={"point_main"}
       style={styleObj}
       id={"point" + props.index}
-      onMouseOver={() => pointSelect(props.index)}
+      onMouseOver={() => {
+        pointSelect(props.index);
+        props.setOpenPointDetails(true);
+        props.setFadeOutDetails(true);
+        props.setButtonFocus(true);
+      }}
       onTouchStart={() => pointSelect(props.index)}
     />
   );
