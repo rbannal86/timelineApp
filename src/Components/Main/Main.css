@@ -8,10 +8,6 @@
   justify-content: flex-start;
 }
 
-.main_utilities {
-  position: absolute;
-}
-
 #main_canvas {
   width: 100%;
   height: 100%;

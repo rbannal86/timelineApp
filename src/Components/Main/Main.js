@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import { useDrop } from "react-dnd";
 import Point from "../Point/Point";
+import Utilities from "../Utilities/Utilities";
 
 import "./Main.css";
 import { ItemTypes } from "../../Service/dndItemTypes";
@@ -12,6 +13,8 @@ export default function Main() {
   const [canvasX, setCanvasX] = useState();
   const [canvasY, setCanvasY] = useState();
   const [movingPoint, setMovingPoint] = useState();
+  const [screenLock, setScreenLock] = useState(false);
+  const [previousMove, setPreviousMove] = useState({});
 
   const canvasMain = useRef(null);
 
@@ -31,17 +34,21 @@ export default function Main() {
   }, [canvasX, canvasY]);
 
   const addPoint = (e) => {
-    let newPoints = [...points];
-    const area = document.getElementById("main_canvas").getBoundingClientRect();
-    const relativeY = e.clientY / area.height;
-    const relativeX = e.clientX / area.width;
+    if (!screenLock) {
+      let newPoints = [...points];
+      const area = document
+        .getElementById("main_canvas")
+        .getBoundingClientRect();
+      const relativeY = e.clientY / area.height;
+      const relativeX = e.clientX / area.width;
 
-    newPoints.push({
-      relativeX,
-      relativeY,
-    });
-    setPoints(newPoints);
-    setCanvasUpdated(!canvasUpdated);
+      newPoints.push({
+        relativeX,
+        relativeY,
+      });
+      setPoints(newPoints);
+      setCanvasUpdated(!canvasUpdated);
+    }
   };
 
   const renderPaths = () => {
@@ -51,9 +58,18 @@ export default function Main() {
       let svgCurve = `M ${x1} ${y1} `;
       let x2 = points[1].relativeX * canvasX;
       let y2 = points[1].relativeY * canvasY;
-      let cx1 = (x1 + x2) * 0.25;
+      let cx1;
+      let cx2;
+      if (x1 > x2) {
+        cx1 = (x1 + x2) * 0.4;
+        cx2 = (x1 + x2) * 0.6;
+      } else {
+        cx2 = (x1 + x2) * 0.4;
+        cx1 = (x1 + x2) * 0.6;
+      }
+
       let cy1 = (y1 + y2) * 0.25;
-      let cx2 = (x1 + x2) * 0.75;
+
       let cy2 = (y1 + y2) * 0.75;
       svgCurve = svgCurve + `C ${cx1} ${cy1} ${cx2} ${cy2} ${x2} ${y2}`;
 
@@ -90,11 +106,13 @@ export default function Main() {
           index={index}
           key={index}
           setMovingPoint={setMovingPoint}
+          updatePointPosition={updatePointPosition}
         />
       );
     });
   };
 
+  //Functions for Utilities Buttons
   const showPath = () => {
     if (document.getElementById("main_path")) {
       let time = (points.length / (points.length + 5)) * 10;
@@ -116,6 +134,25 @@ export default function Main() {
     }
   };
 
+  const deleteLastPoint = () => {
+    if (points.length > 0) {
+      let updatedPoints = [...points];
+      updatedPoints.pop();
+      setPoints(updatedPoints);
+      setCanvasUpdated(!canvasUpdated);
+    }
+  };
+
+  const undoLastMove = () => {
+    if (previousMove) {
+      let updatedPoints = [...points];
+      updatedPoints[previousMove.index].relativeX = previousMove.relativeX;
+      updatedPoints[previousMove.index].relativeY = previousMove.relativeY;
+      setPoints(updatedPoints);
+      setPreviousMove(null);
+    }
+  };
+
   const [, drop] = useDrop({
     accept: ItemTypes.POINT,
     drop: (item, monitor) => {
@@ -124,11 +161,16 @@ export default function Main() {
     collect: (monitor) => ({ isOver: !!monitor.isOver() }),
   });
 
-  const updatePointPosition = (difference) => {
+  const updatePointPosition = (difference, index = movingPoint) => {
+    setPreviousMove({
+      index: movingPoint,
+      relativeX: points[index].relativeX,
+      relativeY: points[index].relativeY,
+    });
     let newPoints = [...points];
     const area = document.getElementById("main_canvas").getBoundingClientRect();
-    let initialX = points[movingPoint].relativeX * area.width;
-    let initialY = points[movingPoint].relativeY * area.height;
+    let initialX = points[index].relativeX * area.width;
+    let initialY = points[index].relativeY * area.height;
     let x = initialX + difference.x;
     let y = initialY + difference.y;
     const relativeY = y / area.height;
@@ -139,13 +181,18 @@ export default function Main() {
 
     setPoints(newPoints);
     setCanvasUpdated(!canvasUpdated);
+    setMovingPoint(null);
   };
 
   return (
     <div className={"main_main"} ref={drop}>
-      <div className={"main_utilities"}>
-        <button onClick={() => showPath()}>Show Path</button>
-      </div>
+      <Utilities
+        showPath={showPath}
+        deleteLastPoint={deleteLastPoint}
+        setScreenLock={setScreenLock}
+        screenLock={screenLock}
+        undoLastMove={undoLastMove}
+      />
       <svg
         ref={canvasMain}
         id={"main_canvas"}
