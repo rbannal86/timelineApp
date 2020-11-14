@@ -1,7 +1,21 @@
 .point_main {
-  width: 10px;
-  height: 10px;
+  width: 20px;
+  height: 20px;
   background-color: lime;
   border-radius: 50%;
   border: none;
+  margin-top: -10px;
+  margin-left: -10px;
+  transition: 0.5s;
+  outline: none;
+}
+
+.point_main:active,
+.point_main:hover {
+  background-color: red;
+  width: 40px;
+  height: 40px;
+  margin-top: -20px;
+  margin-left: -20px;
+  border: 2px solid black;
 }

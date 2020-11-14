@@ -21,10 +21,10 @@ export default function Point(props) {
     position: "absolute",
     top: props.canvasY * props.relativeY,
     left: props.canvasX * props.relativeX,
-    width: "20px",
-    height: "20px",
-    marginTop: "-10px",
-    marginLeft: "-10px",
+    // width: "20px",
+    // height: "20px",
+    // marginTop: "-10px",
+    // marginLeft: "-10px",
     opacity: isDragging ? 0.5 : 1,
   };
 

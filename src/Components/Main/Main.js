@@ -41,7 +41,6 @@ export default function Main() {
         .getBoundingClientRect();
       const relativeY = e.clientY / area.height;
       const relativeX = e.clientX / area.width;
-
       newPoints.push({
         relativeX,
         relativeY,
@@ -67,12 +66,9 @@ export default function Main() {
         cx2 = (x1 + x2) * 0.4;
         cx1 = (x1 + x2) * 0.6;
       }
-
       let cy1 = (y1 + y2) * 0.25;
-
       let cy2 = (y1 + y2) * 0.75;
       svgCurve = svgCurve + `C ${cx1} ${cy1} ${cx2} ${cy2} ${x2} ${y2}`;
-
       if (points.length > 2) {
         for (let i = 2; i < points.length; i++) {
           let x = points[i].relativeX * canvasX;
@@ -116,10 +112,8 @@ export default function Main() {
   const showPath = () => {
     if (document.getElementById("main_path")) {
       let time = (points.length / (points.length + 5)) * 10;
-
       const path = document.getElementById("main_path");
       const length = path.getTotalLength();
-
       path.style.transition = path.style.WebkitTransition = "none";
       path.style.strokeDasharray = length + " " + length;
       path.style.strokeDashoffset = length;
