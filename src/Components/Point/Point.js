@@ -31,6 +31,7 @@ export default function Point(props) {
       style={styleObj}
       id={"point" + props.index}
       onMouseOver={() => props.setMovingPoint(props.index)}
+      onTouchStart={() => props.setMovingPoint(props.index)}
     />
   );
 }
