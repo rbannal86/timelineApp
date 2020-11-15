@@ -1,6 +1,21 @@
 .point_details_main {
   /* animation: fadein 1s ease-in-out;
   animation-direction: alternate; */
+  transition: all 0.5s linear;
+}
+
+.point_details_main:hover {
+  z-index: 4;
+  animation: tofront 1s linear;
+}
+
+@keyframes tofront {
+  0% {
+    z-index: 1;
+  }
+  100% {
+    z-index: 3;
+  }
 }
 
 @keyframes fadein {

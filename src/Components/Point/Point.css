@@ -6,16 +6,18 @@
   border: none;
   margin-top: -10px;
   margin-left: -10px;
-  transition: 2s;
+  transition: all 0.5s linear;
   outline: none;
 }
 
 .point_main:active,
 .point_main:hover {
   background-color: red;
-  width: 40px;
-  height: 40px;
+  /* width: 40px;
+  height: 40px; */
+  transform: scale(1.2);
   margin-top: -20px;
   margin-left: -20px;
   border: 2px solid black;
+  z-index: 0;
 }

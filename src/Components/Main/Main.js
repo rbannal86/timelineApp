@@ -9,6 +9,8 @@ import "./Main.css";
 import { ItemTypes } from "../../Service/dndItemTypes";
 
 export default function Main() {
+  console.log("main rendering");
+
   const [points, setPoints] = useState([]);
   const [canvasUpdated, setCanvasUpdated] = useState(false);
   const [canvasX, setCanvasX] = useState();
@@ -19,18 +21,24 @@ export default function Main() {
   const [openPointDetails, setOpenPointDetails] = useState(false);
   const [fadeOutDetails, setFadeOutDetails] = useState(false);
   const [buttonFocus, setButtonFocus] = useState(false);
+  const [windowUpdated, setWindowUpdated] = useState(false);
 
   const canvasMain = useRef(null);
 
   useEffect(() => {
     const setContainerDimensions = () => {
+      setWindowUpdated(true);
       setTimeout(() => {
-        const container = ReactDOM.findDOMNode(
-          canvasMain.current
-        ).getBoundingClientRect();
-        setCanvasX(container.width);
-        setCanvasY(container.height);
-      }, 500);
+        if (ReactDOM.findDOMNode(canvasMain.current)) {
+          const container = ReactDOM.findDOMNode(
+            canvasMain.current
+          ).getBoundingClientRect();
+          setCanvasX(container.width);
+          setCanvasY(container.height);
+          setWindowUpdated(false);
+          showPath();
+        }
+      }, 1000);
     };
 
     window.addEventListener("resize", setContainerDimensions);
@@ -113,10 +121,22 @@ export default function Main() {
           movingPoint={movingPoint}
           setButtonFocus={setButtonFocus}
           buttonFocus={buttonFocus}
+          // animateTimeout={animateTimeout}
+          // cancelTimeout={cancelTimeout}
         />
       );
     });
   };
+
+  //Timeout handlers for animation
+  // const animateTimeout = () => {
+  //   console.log("timeout");
+  //   setTimeout(() => setOpenPointDetails(true), 1500);
+  // };
+
+  // const cancelTimeout = () => {
+  //   window.clearTimeout(animateTimeout);
+  // };
 
   //Functions for Utilities Buttons
   const showPath = () => {
@@ -223,7 +243,7 @@ export default function Main() {
           window.clearTimeout("showDetails");
         }}
       >
-        {renderPaths()}
+        {windowUpdated ? null : renderPaths()}
       </svg>
       {renderPoints()}
     </div>

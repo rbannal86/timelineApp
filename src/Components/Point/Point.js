@@ -1,9 +1,13 @@
+import React from "react";
+
 import { useDrag } from "react-dnd";
 import { ItemTypes } from "../../Service/dndItemTypes";
 
 import "./Point.css";
 
-export default function Point(props) {
+const Point = React.memo((props) => {
+  console.log(props.index + " rendering");
+
   let pointSelect = props.setMovingPoint;
 
   const [{ isDragging }, drag] = useDrag({
@@ -26,6 +30,7 @@ export default function Point(props) {
     // marginTop: "-10px",
     // marginLeft: "-10px",
     opacity: isDragging ? 0.5 : 1,
+    zIndex: 0,
   };
 
   if (props.index === props.movingPoint && props.buttonFocus) {
@@ -36,6 +41,7 @@ export default function Point(props) {
       marginTop: "-15px",
       marginLeft: "-15px",
       backgroundColor: "red",
+      zIndex: 1,
     };
   }
 
@@ -52,13 +58,19 @@ export default function Point(props) {
       className={"point_main"}
       style={styleObj}
       id={"point" + props.index}
-      onMouseOver={() => {
-        pointSelect(props.index);
+      onClick={() => {
         props.setOpenPointDetails(true);
         props.setFadeOutDetails(true);
-        props.setButtonFocus(true);
       }}
+      onMouseOver={() => {
+        pointSelect(props.index);
+        props.setButtonFocus(true);
+        // props.animateTimeout();
+      }}
+      // onMouseOut={() => props.cancelTimeout()}
       onTouchStart={() => pointSelect(props.index)}
     />
   );
-}
+});
+
+export default Point;
