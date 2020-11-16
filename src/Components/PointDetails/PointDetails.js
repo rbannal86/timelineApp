@@ -1,11 +1,14 @@
+import React from "react";
 import { useState, useEffect, useRef } from "react";
+import Form from "../../Forms/Form";
 
 import "./PointDetails.css";
 
-export default function PointDetails(props) {
+const PointDetails = React.memo((props) => {
   const [show, setShow] = useState(props.fadeOutDetails);
   const [transform, setTransform] = useState();
   const [expandStyle, setExpandStyle] = useState(null);
+  const [point, setPoint] = useState(props.point);
 
   useEffect(() => {
     if (!props.fadeOutDetails) setShow(false);
@@ -59,6 +62,15 @@ export default function PointDetails(props) {
     };
   }
 
+  const setPointDetails = (details) => {
+    let updatedPoint = { ...props.point };
+    updatedPoint.pointDetails = details;
+    setPoint(updatedPoint);
+    props.updatePointDetails(updatedPoint, props.index);
+  };
+
+  console.log(point);
+
   return (
     <div
       className={"point_details_main"}
@@ -96,6 +108,18 @@ export default function PointDetails(props) {
           X
         </button>
       ) : null}
+      {!point.pointDetails ? (
+        <Form setPointDetails={setPointDetails} />
+      ) : (
+        <div>
+          <h3>{point.pointDetails?.title}</h3>
+          <h4>{point.pointDetails?.date}</h4>
+          <img src={point.pointDetails?.imagePath} alt={"point details"} />
+          <p>{point.pointDetails?.description}</p>
+        </div>
+      )}
     </div>
   );
-}
+});
+
+export default PointDetails;

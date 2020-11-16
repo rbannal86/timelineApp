@@ -175,6 +175,12 @@ export default function Main() {
     } else return null;
   };
 
+  const updatePointDetails = (point, index) => {
+    let updatedPoints = [...points];
+    updatedPoints[index] = point;
+    setPoints(updatedPoints);
+  };
+
   const renderPoints = () => {
     return points.map((point, index) => {
       return (
@@ -218,6 +224,8 @@ export default function Main() {
           setFadeOutDetails={setFadeOutDetails}
           setLockView={setLockView}
           lockView={lockView}
+          updatePointDetails={updatePointDetails}
+          index={movingPoint}
         />
       ) : null}
       <svg
