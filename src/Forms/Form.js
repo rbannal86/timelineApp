@@ -47,6 +47,7 @@ export default function Form(props) {
       onSubmit={(e) => {
         handleSubmit(e);
       }}
+      className={"form_main"}
     >
       <h2>Add Details</h2>
       <label>Title</label>

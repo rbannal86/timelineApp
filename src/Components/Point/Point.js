@@ -63,9 +63,7 @@ const Point = React.memo((props) => {
       onMouseOver={() => {
         pointSelect(props.index);
         props.setButtonFocus(true);
-        // props.animateTimeout();
       }}
-      // onMouseOut={() => props.cancelTimeout()}
       onTouchStart={() => pointSelect(props.index)}
     />
   );

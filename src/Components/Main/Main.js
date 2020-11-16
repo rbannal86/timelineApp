@@ -234,7 +234,7 @@ export default function Main() {
         onClick={(e) => {
           addPoint(e);
         }}
-        onMouseEnter={() => {
+        onMouseOver={() => {
           if (!lockView) {
             setFadeOutDetails(false);
             setButtonFocus(false);

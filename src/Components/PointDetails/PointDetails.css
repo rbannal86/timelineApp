@@ -5,6 +5,21 @@
   backface-visibility: hidden;
 }
 
+.point_details_image {
+  max-width: 80%;
+}
+
+/* .point_details_content {
+  width: 90%;
+  height: 90%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  position: relative;
+  font-size: 1.3rem;
+  margin: auto;
+} */
+
 @keyframes fadein {
   from {
     opacity: 0;

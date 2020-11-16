@@ -69,7 +69,18 @@ const PointDetails = React.memo((props) => {
     props.updatePointDetails(updatedPoint, props.index);
   };
 
-  console.log(point);
+  const contentStyleObj = {
+    fontSize: ".5rem",
+    lineHeight: ".8rem",
+    width: "90%",
+    height: "90%",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "flex-start",
+    margin: "auto",
+  };
+
+  console.log(props.canvasY);
 
   return (
     <div
@@ -82,10 +93,10 @@ const PointDetails = React.memo((props) => {
             height: "80%",
             position: "absolute",
             top: "10%",
-            left: props.canvasY,
+            right: "10%",
             backgroundColor: "white",
             zIndex: 2,
-            // animation: `${!props.lockView ? null : "fadeout .5s"}`,
+            animation: `${!props.lockView ? null : "fadeout .5s"}`,
           });
           props.setLockView(true);
         }
@@ -109,12 +120,20 @@ const PointDetails = React.memo((props) => {
         </button>
       ) : null}
       {!point.pointDetails ? (
-        <Form setPointDetails={setPointDetails} />
+        <div className={"point_details_content"} style={contentStyleObj}>
+          <Form setPointDetails={setPointDetails} />
+        </div>
       ) : (
-        <div>
+        <div className={"point_details_content"} style={contentStyleObj}>
           <h3>{point.pointDetails?.title}</h3>
           <h4>{point.pointDetails?.date}</h4>
-          <img src={point.pointDetails?.imagePath} alt={"point details"} />
+          {point.pointDetails.imagePath ? (
+            <img
+              src={point.pointDetails?.imagePath}
+              alt={"point details"}
+              className="point_details_image"
+            />
+          ) : null}
           <p>{point.pointDetails?.description}</p>
         </div>
       )}
