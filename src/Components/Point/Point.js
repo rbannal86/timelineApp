@@ -6,8 +6,6 @@ import { ItemTypes } from "../../Service/dndItemTypes";
 import "./Point.css";
 
 const Point = React.memo((props) => {
-  console.log(props.index + " rendering");
-
   let pointSelect = props.setMovingPoint;
 
   const [{ isDragging }, drag] = useDrag({

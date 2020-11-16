@@ -3,9 +3,9 @@ import { useState, useEffect, useRef } from "react";
 import "./PointDetails.css";
 
 export default function PointDetails(props) {
-  console.log("point details rendering");
   const [show, setShow] = useState(props.fadeOutDetails);
   const [transform, setTransform] = useState();
+  const [expandStyle, setExpandStyle] = useState(null);
 
   useEffect(() => {
     if (!props.fadeOutDetails) setShow(false);
@@ -16,8 +16,10 @@ export default function PointDetails(props) {
   let transformX;
   let transformY;
 
+  console.log(show);
+
   styleObj.current = {
-    animation: `${show ? "fadein" : "fadeout"} 1s `,
+    animation: `${show ? "fadein 1s" : "fadeout 1s"}`,
     position: "absolute",
     backgroundColor: "#FFFFFF",
     width: "50px",
@@ -25,8 +27,6 @@ export default function PointDetails(props) {
     zIndex: 1,
     transform: transform,
   };
-
-  console.log(styleObj.current);
 
   if (!props.point) {
     styleObj.current = { display: "none" };
@@ -62,19 +62,40 @@ export default function PointDetails(props) {
   return (
     <div
       className={"point_details_main"}
-      style={styleObj.current}
+      style={expandStyle ? expandStyle : styleObj.current}
       onClick={() => {
-        console.log("click");
+        if (!props.lockView) {
+          setExpandStyle({
+            width: "30%",
+            height: "80%",
+            position: "absolute",
+            top: "10%",
+            left: props.canvasY,
+            backgroundColor: "white",
+            zIndex: 2,
+            // animation: `${!props.lockView ? null : "fadeout .5s"}`,
+          });
+          props.setLockView(true);
+        }
       }}
       onMouseEnter={() => {
-        console.log("mouseenter");
-
         setTransform(`scale(3) translate(${transformX}, ${transformY})`);
       }}
       onMouseLeave={() => {}}
       onAnimationEnd={() => {
         if (props.openPointDetails && !show) props.setOpenPointDetails(false);
       }}
-    ></div>
+    >
+      {props.lockView ? (
+        <button
+          onClick={() => {
+            props.setLockView(false);
+            setExpandStyle(null);
+          }}
+        >
+          X
+        </button>
+      ) : null}
+    </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import ReactDOM from "react-dom";
 import { useDrop } from "react-dnd";
 import Point from "../Point/Point";
@@ -9,21 +9,93 @@ import "./Main.css";
 import { ItemTypes } from "../../Service/dndItemTypes";
 
 export default function Main() {
-  console.log("main rendering");
-
   const [points, setPoints] = useState([]);
   const [canvasUpdated, setCanvasUpdated] = useState(false);
   const [canvasX, setCanvasX] = useState();
   const [canvasY, setCanvasY] = useState();
   const [movingPoint, setMovingPoint] = useState();
   const [screenLock, setScreenLock] = useState(false);
-  const [previousMove, setPreviousMove] = useState({});
+  const [previousMove, setPreviousMove] = useState();
   const [openPointDetails, setOpenPointDetails] = useState(false);
   const [fadeOutDetails, setFadeOutDetails] = useState(false);
   const [buttonFocus, setButtonFocus] = useState(false);
   const [windowUpdated, setWindowUpdated] = useState(false);
+  const [lockView, setLockView] = useState(false);
 
   const canvasMain = useRef(null);
+
+  //Functions for Utilities Buttons
+  const showPath = useCallback(() => {
+    if (document.getElementById("main_path")) {
+      let time = (points.length / (points.length + 5)) * 10;
+      const path = document.getElementById("main_path");
+      const length = path.getTotalLength();
+      path.style.transition = path.style.WebkitTransition = "none";
+      path.style.strokeDasharray = length + " " + length;
+      path.style.strokeDashoffset = length;
+      path.getBoundingClientRect();
+      path.style.transition = path.style.WebkitTransition = `stroke-dashoffset ${time}s ease-in-out`;
+      path.style.strokeDashoffset = "0";
+      setTimeout(() => {
+        path.style.transition = path.style.WebkitTransition = "none";
+        path.style.strokeDasharray = null;
+        path.style.strokeDashoffset = null;
+      }, time * 1000);
+    }
+  }, [points.length]);
+
+  const deleteLastPoint = () => {
+    if (points.length > 0) {
+      let updatedPoints = [...points];
+      updatedPoints.pop();
+      setPoints(updatedPoints);
+      setCanvasUpdated(!canvasUpdated);
+    }
+  };
+
+  const undoLastMove = () => {
+    if (previousMove) {
+      let updatedPoints = [...points];
+      updatedPoints[previousMove.index].relativeX = previousMove.relativeX;
+      updatedPoints[previousMove.index].relativeY = previousMove.relativeY;
+      setPoints(updatedPoints);
+      setPreviousMove(null);
+    }
+  };
+
+  const [, drop] = useDrop({
+    accept: ItemTypes.POINT,
+    hover: () => {
+      if (fadeOutDetails) setFadeOutDetails(false);
+    },
+    drop: (item, monitor) => {
+      updatePointPosition(monitor.getDifferenceFromInitialOffset());
+    },
+    collect: (monitor) => ({ isOver: !!monitor.isOver() }),
+  });
+
+  const updatePointPosition = (difference, index = movingPoint) => {
+    setPreviousMove({
+      index: movingPoint,
+      relativeX: points[index].relativeX,
+      relativeY: points[index].relativeY,
+    });
+    let newPoints = [...points];
+    const area = document.getElementById("main_canvas").getBoundingClientRect();
+    let initialX = points[index].relativeX * area.width;
+    let initialY = points[index].relativeY * area.height;
+    let x = initialX + difference.x;
+    let y = initialY + difference.y;
+    const relativeY = y / area.height;
+    const relativeX = x / area.width;
+
+    newPoints[movingPoint].relativeX = relativeX;
+    newPoints[movingPoint].relativeY = relativeY;
+
+    setPoints(newPoints);
+    setCanvasUpdated(!canvasUpdated);
+    setMovingPoint(null);
+  };
 
   useEffect(() => {
     const setContainerDimensions = () => {
@@ -43,10 +115,10 @@ export default function Main() {
 
     window.addEventListener("resize", setContainerDimensions);
     if (!canvasX && !canvasY) setContainerDimensions();
-  }, [canvasX, canvasY]);
+  }, [canvasX, canvasY, showPath]);
 
   const addPoint = (e) => {
-    if (!screenLock) {
+    if (!screenLock && !lockView) {
       let newPoints = [...points];
       const area = document
         .getElementById("main_canvas")
@@ -121,94 +193,9 @@ export default function Main() {
           movingPoint={movingPoint}
           setButtonFocus={setButtonFocus}
           buttonFocus={buttonFocus}
-          // animateTimeout={animateTimeout}
-          // cancelTimeout={cancelTimeout}
         />
       );
     });
-  };
-
-  //Timeout handlers for animation
-  // const animateTimeout = () => {
-  //   console.log("timeout");
-  //   setTimeout(() => setOpenPointDetails(true), 1500);
-  // };
-
-  // const cancelTimeout = () => {
-  //   window.clearTimeout(animateTimeout);
-  // };
-
-  //Functions for Utilities Buttons
-  const showPath = () => {
-    if (document.getElementById("main_path")) {
-      let time = (points.length / (points.length + 5)) * 10;
-      const path = document.getElementById("main_path");
-      const length = path.getTotalLength();
-      path.style.transition = path.style.WebkitTransition = "none";
-      path.style.strokeDasharray = length + " " + length;
-      path.style.strokeDashoffset = length;
-      path.getBoundingClientRect();
-      path.style.transition = path.style.WebkitTransition = `stroke-dashoffset ${time}s ease-in-out`;
-      path.style.strokeDashoffset = "0";
-      setTimeout(() => {
-        path.style.transition = path.style.WebkitTransition = "none";
-        path.style.strokeDasharray = null;
-        path.style.strokeDashoffset = null;
-      }, time * 1000);
-    }
-  };
-
-  const deleteLastPoint = () => {
-    if (points.length > 0) {
-      let updatedPoints = [...points];
-      updatedPoints.pop();
-      setPoints(updatedPoints);
-      setCanvasUpdated(!canvasUpdated);
-    }
-  };
-
-  const undoLastMove = () => {
-    if (previousMove) {
-      let updatedPoints = [...points];
-      updatedPoints[previousMove.index].relativeX = previousMove.relativeX;
-      updatedPoints[previousMove.index].relativeY = previousMove.relativeY;
-      setPoints(updatedPoints);
-      setPreviousMove(null);
-    }
-  };
-
-  const [, drop] = useDrop({
-    accept: ItemTypes.POINT,
-    hover: () => {
-      if (fadeOutDetails) setFadeOutDetails(false);
-    },
-    drop: (item, monitor) => {
-      updatePointPosition(monitor.getDifferenceFromInitialOffset());
-    },
-    collect: (monitor) => ({ isOver: !!monitor.isOver() }),
-  });
-
-  const updatePointPosition = (difference, index = movingPoint) => {
-    setPreviousMove({
-      index: movingPoint,
-      relativeX: points[index].relativeX,
-      relativeY: points[index].relativeY,
-    });
-    let newPoints = [...points];
-    const area = document.getElementById("main_canvas").getBoundingClientRect();
-    let initialX = points[index].relativeX * area.width;
-    let initialY = points[index].relativeY * area.height;
-    let x = initialX + difference.x;
-    let y = initialY + difference.y;
-    const relativeY = y / area.height;
-    const relativeX = x / area.width;
-
-    newPoints[movingPoint].relativeX = relativeX;
-    newPoints[movingPoint].relativeY = relativeY;
-
-    setPoints(newPoints);
-    setCanvasUpdated(!canvasUpdated);
-    setMovingPoint(null);
   };
 
   return (
@@ -229,6 +216,8 @@ export default function Main() {
           openPointDetails={openPointDetails}
           fadeOutDetails={fadeOutDetails}
           setFadeOutDetails={setFadeOutDetails}
+          setLockView={setLockView}
+          lockView={lockView}
         />
       ) : null}
       <svg
@@ -238,9 +227,10 @@ export default function Main() {
           addPoint(e);
         }}
         onMouseEnter={() => {
-          setFadeOutDetails(false);
-          setButtonFocus(false);
-          window.clearTimeout("showDetails");
+          if (!lockView) {
+            setFadeOutDetails(false);
+            setButtonFocus(false);
+          }
         }}
       >
         {windowUpdated ? null : renderPaths()}
