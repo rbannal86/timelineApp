@@ -23,10 +23,6 @@ const Point = React.memo((props) => {
     position: "absolute",
     top: props.canvasY * props.relativeY,
     left: props.canvasX * props.relativeX,
-    // width: "20px",
-    // height: "20px",
-    // marginTop: "-10px",
-    // marginLeft: "-10px",
     opacity: isDragging ? 0.5 : 1,
     zIndex: 0,
   };
@@ -43,13 +39,6 @@ const Point = React.memo((props) => {
     };
   }
 
-  // let openDetailsTimeout = setTimeout(
-  //   () => props.setOpenPointDetails(false),
-  //   1000
-  // );
-
-  // let stopOpenDetailsTimeout = () => window.clearTimeout(openDetailsTimeout);
-
   return (
     <button
       ref={drag}
@@ -57,8 +46,10 @@ const Point = React.memo((props) => {
       style={styleObj}
       id={"point" + props.index}
       onClick={() => {
-        props.setOpenPointDetails(true);
-        props.setFadeOutDetails(true);
+        // props.setOpenPointDetails(true);
+        // props.setFadeOutDetails(true);
+        if (props.movingPoint === props.index)
+          props.setOpenDetailsPreview(!props.openDetailsPreview);
       }}
       onMouseOver={() => {
         pointSelect(props.index);

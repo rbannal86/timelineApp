@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import ReactDOM from "react-dom";
+import React, { useState, useEffect, useCallback } from "react";
 import { useDrop } from "react-dnd";
 import Point from "../Point/Point";
 import Utilities from "../Utilities/Utilities";
 import PointDetails from "../PointDetails/PointDetails";
+import Canvas from "../Canvas/Canvas";
+import DetailsPreview from "../DetailsPreview/DetailsPreview";
 
 import "./Main.css";
 import { ItemTypes } from "../../Service/dndItemTypes";
@@ -21,11 +22,11 @@ export default function Main() {
   const [buttonFocus, setButtonFocus] = useState(false);
   const [windowUpdated, setWindowUpdated] = useState(false);
   const [lockView, setLockView] = useState(false);
-
-  const canvasMain = useRef(null);
+  const [openDetailsPreview, setOpenDetailsPreview] = useState(false);
 
   //Functions for Utilities Buttons
   const showPath = useCallback(() => {
+    console.log("showing path");
     if (document.getElementById("main_path")) {
       let time = (points.length / (points.length + 5)) * 10;
       const path = document.getElementById("main_path");
@@ -81,7 +82,10 @@ export default function Main() {
       relativeY: points[index].relativeY,
     });
     let newPoints = [...points];
-    const area = document.getElementById("main_canvas").getBoundingClientRect();
+    const area = document.getElementById("canvas_main").getBoundingClientRect();
+    // const area = ReactDOM.findDOMNode(
+    //   canvasMain.current
+    // ).getBoundingClientRect();
     let initialX = points[index].relativeX * area.width;
     let initialY = points[index].relativeY * area.height;
     let x = initialX + difference.x;
@@ -101,16 +105,20 @@ export default function Main() {
     const setContainerDimensions = () => {
       setWindowUpdated(true);
       setTimeout(() => {
-        if (ReactDOM.findDOMNode(canvasMain.current)) {
-          const container = ReactDOM.findDOMNode(
-            canvasMain.current
-          ).getBoundingClientRect();
+        // if (ReactDOM.findDOMNode(canvasMain.current)) {
+        if (document.getElementById("canvas_main")) {
+          const container = document
+            .getElementById("canvas_main")
+            .getBoundingClientRect();
+          // const container = ReactDOM.findDOMNode(
+          //   canvasMain.current
+          // ).getBoundingClientRect();
           setCanvasX(container.width);
           setCanvasY(container.height);
           setWindowUpdated(false);
-          showPath();
+          // showPath();
         }
-      }, 1000);
+      }, 20);
     };
 
     window.addEventListener("resize", setContainerDimensions);
@@ -120,9 +128,11 @@ export default function Main() {
   const addPoint = (e) => {
     if (!screenLock && !lockView) {
       let newPoints = [...points];
-      const area = document
-        .getElementById("main_canvas")
-        .getBoundingClientRect();
+      const area =
+        // ReactDOM.findDOMNode(
+        //   canvasMain.current
+        // ).getBoundingClientRect();
+        document.getElementById("canvas_main").getBoundingClientRect();
       const relativeY = e.clientY / area.height;
       const relativeX = e.clientX / area.width;
       newPoints.push({
@@ -135,7 +145,7 @@ export default function Main() {
   };
 
   const renderPaths = () => {
-    if (points.length > 1) {
+    if (points.length > 1 && !windowUpdated) {
       let x1 = points[0].relativeX * canvasX;
       let y1 = points[0].relativeY * canvasY;
       let svgCurve = `M ${x1} ${y1} `;
@@ -192,17 +202,21 @@ export default function Main() {
           index={index}
           key={index}
           setMovingPoint={setMovingPoint}
-          updatePointPosition={updatePointPosition}
           setOpenPointDetails={setOpenPointDetails}
           setFadeOutDetails={setFadeOutDetails}
           fadeOutDetails={fadeOutDetails}
           movingPoint={movingPoint}
           setButtonFocus={setButtonFocus}
           buttonFocus={buttonFocus}
+          setOpenDetailsPreview={setOpenDetailsPreview}
+          openDetailsPreview={openDetailsPreview}
         />
       );
     });
   };
+
+  console.log(buttonFocus);
+  console.log(openDetailsPreview);
 
   return (
     <div className={"main_main"} ref={drop}>
@@ -218,17 +232,26 @@ export default function Main() {
           point={points[movingPoint]}
           canvasX={canvasX}
           canvasY={canvasY}
-          setOpenPointDetails={setOpenPointDetails}
-          openPointDetails={openPointDetails}
-          fadeOutDetails={fadeOutDetails}
           setFadeOutDetails={setFadeOutDetails}
-          setLockView={setLockView}
-          lockView={lockView}
           updatePointDetails={updatePointDetails}
           index={movingPoint}
         />
       ) : null}
-      <svg
+      <Canvas
+        addPoint={addPoint}
+        openDetailsPreview={openDetailsPreview}
+        windowUpdated={windowUpdated}
+        renderPaths={renderPaths}
+        setButtonFocus={setButtonFocus}
+      />
+      {openDetailsPreview ? (
+        <DetailsPreview
+          point={points[movingPoint]}
+          canvasX={canvasX}
+          canvasY={canvasY}
+        />
+      ) : null}
+      {/* <svg
         ref={canvasMain}
         id={"main_canvas"}
         onClick={(e) => {
@@ -242,7 +265,7 @@ export default function Main() {
         }}
       >
         {windowUpdated ? null : renderPaths()}
-      </svg>
+      </svg> */}
       {renderPoints()}
     </div>
   );

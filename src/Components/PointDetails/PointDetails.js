@@ -102,7 +102,9 @@ const PointDetails = React.memo((props) => {
         }
       }}
       onMouseEnter={() => {
-        setTransform(`scale(3) translate(${transformX}, ${transformY})`);
+        setTransform(
+          `scale(3) translateZ(0) translate(${transformX}, ${transformY})`
+        );
       }}
       onMouseLeave={() => {}}
       onAnimationEnd={() => {
