@@ -3,6 +3,7 @@
   flex-direction: column;
   justify-content: space-evenly;
   max-height: 100%;
+  font-size: 12rem;
 }
 
 .form_main > * {

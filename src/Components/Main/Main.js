@@ -231,6 +231,8 @@ export default function Main() {
           setFadeOutDetails={setFadeOutDetails}
           updatePointDetails={updatePointDetails}
           index={movingPoint}
+          setLockView={setLockView}
+          setOpenPointDetails={setOpenPointDetails}
         />
       ) : null}
       <Canvas
@@ -249,6 +251,7 @@ export default function Main() {
         setLockView={setLockView}
         setOpenPointDetails={setOpenPointDetails}
         openPointDetails={openPointDetails}
+        lockView={lockView}
       />
       {renderPoints()}
     </div>

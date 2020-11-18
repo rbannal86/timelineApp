@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-
 import { Transition } from "react-transition-group";
+
+import "./DetailsPreview.css";
 
 const DetailsPreview = (props) => {
   const [point, setPoint] = useState();
@@ -20,27 +21,25 @@ const DetailsPreview = (props) => {
   });
 
   useEffect(() => {
-    console.log("movingpoint");
     if (!point && props.point) setPoint(props.point);
     if (point !== props.point && props.point) setPoint(props.point);
 
     if (relativeX !== point?.relativeX && relativeY !== point?.relativeY) {
-      console.log("settingrelatives");
       setRelativeX(point.relativeX);
       setRelativeY(point.relativeY);
     }
 
     let newStyleObj;
     if (relativeX && relativeY) {
-      if (relativeX <= 0.5 && relativeY <= 0.5) console.log("here");
-      newStyleObj = {
-        ...styleObj,
-        top: relativeY * props.canvasY,
-        left: relativeX * props.canvasX,
-        bottom: null,
-        right: null,
-        transformOrigin: "top",
-      };
+      if (relativeX <= 0.5 && relativeY <= 0.5)
+        newStyleObj = {
+          ...styleObj,
+          top: relativeY * props.canvasY,
+          left: relativeX * props.canvasX,
+          bottom: null,
+          right: null,
+          transformOrigin: "top",
+        };
       if (relativeX <= 0.5 && relativeY > 0.5)
         newStyleObj = {
           ...styleObj,
@@ -74,7 +73,6 @@ const DetailsPreview = (props) => {
       )
         setStyleObj(newStyleObj);
     } else if (!props.openPointDetails) {
-      console.log("resettingstyle");
       newStyleObj = { ...styleObj, bottom: 0, left: 0 };
     }
     if (
@@ -93,27 +91,48 @@ const DetailsPreview = (props) => {
     exited: { opacity: 0 },
   };
 
-  return (
-    <Transition
-      in={props.in}
-      timeout={{ appear: 100, enter: 500, exit: 500 }}
-      appear
-      unmountOnExit
-    >
-      {(state) => (
-        <div
-          onClick={() => {
-            console.log("click");
-            props.setOpenPointDetails(true);
-            props.setLockView(true);
-          }}
-          id="details_preview_main"
-          className={"details_preview_main"}
-          style={{ ...styleObj, ...transitionStyles[state] }}
-        ></div>
-      )}
-    </Transition>
-  );
+  console.log(props.lockView);
+
+  if (props.lockView) return null;
+  else
+    return (
+      <Transition
+        in={props.in}
+        timeout={{ appear: 100, enter: 500, exit: 500 }}
+        appear
+        unmountOnExit
+      >
+        {(state) => (
+          <div
+            onClick={() => {
+              props.setOpenPointDetails(true);
+              props.setLockView(true);
+            }}
+            id="details_preview_main"
+            className={"details_preview_main"}
+            style={{ ...styleObj, ...transitionStyles[state] }}
+          >
+            {point.pointDetails ? (
+              <div className={"details_preview_content"}>
+                {point.pointDetails.title ? (
+                  <h3>{point.pointDetails.title}</h3>
+                ) : null}
+                {point.pointDetails.date ? (
+                  <div>{point.pointDetails.date}</div>
+                ) : null}
+                {point.pointDetails.imagePath ? (
+                  <img
+                    src={point.pointDetails.imagePath}
+                    alt="description"
+                    className={"details_preview_image"}
+                  />
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+        )}
+      </Transition>
+    );
 };
 
 export default DetailsPreview;

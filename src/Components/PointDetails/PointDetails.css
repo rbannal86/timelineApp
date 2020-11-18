@@ -11,16 +11,19 @@
   max-width: 80%;
 }
 
-/* .point_details_content {
+.point_details_content {
   width: 90%;
   height: 90%;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  position: relative;
   font-size: 1.3rem;
   margin: auto;
-} */
+}
+
+.point_details_description {
+  overflow: scroll;
+}
 
 @keyframes fadein {
   from {
@@ -28,14 +31,5 @@
   }
   to {
     opacity: 1;
-  }
-}
-
-@keyframes fadeout {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
   }
 }
