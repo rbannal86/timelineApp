@@ -91,8 +91,6 @@ const DetailsPreview = (props) => {
     exited: { opacity: 0 },
   };
 
-  console.log(props.lockView);
-
   if (props.lockView) return null;
   else
     return (

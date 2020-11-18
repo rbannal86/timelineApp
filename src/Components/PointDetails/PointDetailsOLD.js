@@ -10,8 +10,6 @@ const PointDetails = React.memo((props) => {
   const [expandStyle, setExpandStyle] = useState(null);
   const [point, setPoint] = useState(props.point);
 
-  console.log("pointdetails");
-
   useEffect(() => {
     if (!props.fadeOutDetails) setShow(false);
     if (props.fadeOutDetails) setShow(true);

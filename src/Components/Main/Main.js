@@ -75,7 +75,6 @@ export default function Main() {
   });
 
   const updatePointPosition = (difference, index = movingPoint) => {
-    console.log(index);
     if (index !== null) {
       setPreviousMove({
         index: movingPoint,
@@ -86,9 +85,6 @@ export default function Main() {
       const area = document
         .getElementById("canvas_main")
         .getBoundingClientRect();
-      // const area = ReactDOM.findDOMNode(
-      //   canvasMain.current
-      // ).getBoundingClientRect();
       let initialX = points[index].relativeX * area.width;
       let initialY = points[index].relativeY * area.height;
       let x = initialX + difference.x;
@@ -109,18 +105,13 @@ export default function Main() {
     const setContainerDimensions = () => {
       setWindowUpdated(true);
       setTimeout(() => {
-        // if (ReactDOM.findDOMNode(canvasMain.current)) {
         if (document.getElementById("canvas_main")) {
           const container = document
             .getElementById("canvas_main")
             .getBoundingClientRect();
-          // const container = ReactDOM.findDOMNode(
-          //   canvasMain.current
-          // ).getBoundingClientRect();
           setCanvasX(container.width);
           setCanvasY(container.height);
           setWindowUpdated(false);
-          // showPath();
         }
       }, 20);
     };
@@ -164,15 +155,26 @@ export default function Main() {
         cx2 = (x1 + x2) * 0.4;
         cx1 = (x1 + x2) * 0.6;
       }
-      let cy1 = (y1 + y2) * 0.25;
-      let cy2 = (y1 + y2) * 0.75;
+      let cy1;
+      let cy2;
+      if (y1 > y2) {
+        cy1 = (y1 + y2) * 0.25;
+        cy2 = (y1 + y2) * 0.75;
+      } else {
+        cy2 = (y1 + y2) * 0.25;
+        cy1 = (y1 + y2) * 0.75;
+      }
+
       svgCurve = svgCurve + `C ${cx1} ${cy1} ${cx2} ${cy2} ${x2} ${y2}`;
       if (points.length > 2) {
         for (let i = 2; i < points.length; i++) {
           let x = points[i].relativeX * canvasX;
           let y = points[i].relativeY * canvasY;
-          let cx = (points[i - 1].relativeX * canvasX + x) * 0.5;
-          let cy = (points[i - 1].relativeY * canvasY + y) * 0.5;
+          let cx =
+            ((points[i - 1].relativeX + points[i].relativeX) / 2.1) * canvasX;
+          let cy =
+            ((points[i - 1].relativeY + points[i].relativeY) / 2.1) * canvasY;
+
           svgCurve = svgCurve + `S ${cx} ${cy} ${x} ${y}`;
         }
       }
