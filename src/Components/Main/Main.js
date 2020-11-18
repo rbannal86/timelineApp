@@ -247,6 +247,8 @@ export default function Main() {
         canvasY={canvasY}
         in={openDetailsPreview}
         setLockView={setLockView}
+        setOpenPointDetails={setOpenPointDetails}
+        openPointDetails={openPointDetails}
       />
       {renderPoints()}
     </div>

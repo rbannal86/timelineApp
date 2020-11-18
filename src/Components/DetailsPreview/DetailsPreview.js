@@ -2,10 +2,6 @@ import { useEffect, useState } from "react";
 
 import { Transition } from "react-transition-group";
 
-// export default function DetailsPreview(props) {
-
-let styleObj = {};
-
 const DetailsPreview = (props) => {
   const [point, setPoint] = useState();
   const [relativeX, setRelativeX] = useState();
@@ -19,28 +15,32 @@ const DetailsPreview = (props) => {
     height: "20vw",
     zIndex: 1,
     border: "1px solid black",
+    bottom: 0,
+    left: 0,
   });
-
-  // useEffect(() => {}, [point, props.point, props.movingPoint]);
 
   useEffect(() => {
     console.log("movingpoint");
     if (!point && props.point) setPoint(props.point);
-    if (point !== props.point) setPoint(props.point);
+    if (point !== props.point && props.point) setPoint(props.point);
 
-    setRelativeX(point?.relativeX);
-    setRelativeY(point?.relativeY);
+    if (relativeX !== point?.relativeX && relativeY !== point?.relativeY) {
+      console.log("settingrelatives");
+      setRelativeX(point.relativeX);
+      setRelativeY(point.relativeY);
+    }
+
     let newStyleObj;
     if (relativeX && relativeY) {
-      if (relativeX <= 0.5 && relativeY <= 0.5)
-        newStyleObj = {
-          ...styleObj,
-          top: relativeY * props.canvasY,
-          left: relativeX * props.canvasX,
-          bottom: null,
-          right: null,
-          transformOrigin: "top",
-        };
+      if (relativeX <= 0.5 && relativeY <= 0.5) console.log("here");
+      newStyleObj = {
+        ...styleObj,
+        top: relativeY * props.canvasY,
+        left: relativeX * props.canvasX,
+        bottom: null,
+        right: null,
+        transformOrigin: "top",
+      };
       if (relativeX <= 0.5 && relativeY > 0.5)
         newStyleObj = {
           ...styleObj,
@@ -68,8 +68,22 @@ const DetailsPreview = (props) => {
           left: null,
           transformOrigin: "bottom",
         };
-    } else newStyleObj = { ...styleObj, bottom: 0, left: 0 };
-    setStyleObj(newStyleObj);
+      if (
+        newStyleObj.top !== styleObj.top ||
+        newStyleObj.bottom !== styleObj.bottom
+      )
+        setStyleObj(newStyleObj);
+    } else if (!props.openPointDetails) {
+      console.log("resettingstyle");
+      newStyleObj = { ...styleObj, bottom: 0, left: 0 };
+    }
+    if (
+      newStyleObj.bottom === 0 &&
+      newStyleObj.left === 0 &&
+      styleObj.bottom !== 0 &&
+      styleObj.left !== 0
+    )
+      setStyleObj(newStyleObj);
   }, [props, point, relativeX, relativeY, props.movingPoint, styleObj]);
 
   const transitionStyles = {
@@ -78,8 +92,6 @@ const DetailsPreview = (props) => {
     exiting: { opacity: 1, transform: "scale(1, 0)" },
     exited: { opacity: 0 },
   };
-
-  console.log(props.in);
 
   return (
     <Transition
@@ -90,6 +102,11 @@ const DetailsPreview = (props) => {
     >
       {(state) => (
         <div
+          onClick={() => {
+            console.log("click");
+            props.setOpenPointDetails(true);
+            props.setLockView(true);
+          }}
           id="details_preview_main"
           className={"details_preview_main"}
           style={{ ...styleObj, ...transitionStyles[state] }}
