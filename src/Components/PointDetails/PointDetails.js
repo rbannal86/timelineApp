@@ -19,8 +19,6 @@ const PointDetails = React.memo((props) => {
   let transformX;
   let transformY;
 
-  console.log(show);
-
   styleObj.current = {
     animation: `${show ? "fadein 1s" : "fadeout 1s"}`,
     position: "absolute",
@@ -79,8 +77,6 @@ const PointDetails = React.memo((props) => {
     justifyContent: "flex-start",
     margin: "auto",
   };
-
-  console.log(props.canvasY);
 
   return (
     <div

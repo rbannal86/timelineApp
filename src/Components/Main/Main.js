@@ -26,7 +26,6 @@ export default function Main() {
 
   //Functions for Utilities Buttons
   const showPath = useCallback(() => {
-    console.log("showing path");
     if (document.getElementById("main_path")) {
       let time = (points.length / (points.length + 5)) * 10;
       const path = document.getElementById("main_path");
@@ -215,9 +214,6 @@ export default function Main() {
     });
   };
 
-  console.log(buttonFocus);
-  console.log(openDetailsPreview);
-
   return (
     <div className={"main_main"} ref={drop}>
       <Utilities
@@ -244,28 +240,14 @@ export default function Main() {
         renderPaths={renderPaths}
         setButtonFocus={setButtonFocus}
       />
-      {openDetailsPreview ? (
-        <DetailsPreview
-          point={points[movingPoint]}
-          canvasX={canvasX}
-          canvasY={canvasY}
-        />
-      ) : null}
-      {/* <svg
-        ref={canvasMain}
-        id={"main_canvas"}
-        onClick={(e) => {
-          addPoint(e);
-        }}
-        onMouseOver={() => {
-          if (!lockView) {
-            setFadeOutDetails(false);
-            setButtonFocus(false);
-          }
-        }}
-      >
-        {windowUpdated ? null : renderPaths()}
-      </svg> */}
+      <DetailsPreview
+        point={points[movingPoint]}
+        movingPoint={movingPoint}
+        canvasX={canvasX}
+        canvasY={canvasY}
+        in={openDetailsPreview}
+        setLockView={setLockView}
+      />
       {renderPoints()}
     </div>
   );

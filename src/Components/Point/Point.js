@@ -30,12 +30,13 @@ const Point = React.memo((props) => {
   if (props.index === props.movingPoint && props.buttonFocus) {
     styleObj = {
       ...styleObj,
-      width: "30px",
-      height: "30px",
-      marginTop: "-15px",
-      marginLeft: "-15px",
+      // width: "30px",
+      // height: "30px",
+      transform: "scale(1.5)",
+      marginTop: "-10px",
+      marginLeft: "-10px",
       backgroundColor: "red",
-      zIndex: 1,
+      zIndex: 2,
     };
   }
 
