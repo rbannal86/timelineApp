@@ -75,29 +75,34 @@ export default function Main() {
   });
 
   const updatePointPosition = (difference, index = movingPoint) => {
-    setPreviousMove({
-      index: movingPoint,
-      relativeX: points[index].relativeX,
-      relativeY: points[index].relativeY,
-    });
-    let newPoints = [...points];
-    const area = document.getElementById("canvas_main").getBoundingClientRect();
-    // const area = ReactDOM.findDOMNode(
-    //   canvasMain.current
-    // ).getBoundingClientRect();
-    let initialX = points[index].relativeX * area.width;
-    let initialY = points[index].relativeY * area.height;
-    let x = initialX + difference.x;
-    let y = initialY + difference.y;
-    const relativeY = y / area.height;
-    const relativeX = x / area.width;
+    console.log(index);
+    if (index !== null) {
+      setPreviousMove({
+        index: movingPoint,
+        relativeX: points[index].relativeX,
+        relativeY: points[index].relativeY,
+      });
+      let newPoints = [...points];
+      const area = document
+        .getElementById("canvas_main")
+        .getBoundingClientRect();
+      // const area = ReactDOM.findDOMNode(
+      //   canvasMain.current
+      // ).getBoundingClientRect();
+      let initialX = points[index].relativeX * area.width;
+      let initialY = points[index].relativeY * area.height;
+      let x = initialX + difference.x;
+      let y = initialY + difference.y;
+      const relativeY = y / area.height;
+      const relativeX = x / area.width;
 
-    newPoints[movingPoint].relativeX = relativeX;
-    newPoints[movingPoint].relativeY = relativeY;
+      newPoints[movingPoint].relativeX = relativeX;
+      newPoints[movingPoint].relativeY = relativeY;
 
-    setPoints(newPoints);
-    setCanvasUpdated(!canvasUpdated);
-    setMovingPoint(null);
+      setPoints(newPoints);
+      setCanvasUpdated(!canvasUpdated);
+      setMovingPoint(null);
+    }
   };
 
   useEffect(() => {
