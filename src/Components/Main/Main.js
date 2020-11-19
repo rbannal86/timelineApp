@@ -5,6 +5,7 @@ import Utilities from "../Utilities/Utilities";
 import PointDetails from "../PointDetails/PointDetails";
 import Canvas from "../Canvas/Canvas";
 import DetailsPreview from "../DetailsPreview/DetailsPreview";
+import SlideshowControls from "../Slideshow/SlideshowControls";
 
 import "./Main.css";
 import { ItemTypes } from "../../Service/dndItemTypes";
@@ -23,6 +24,11 @@ export default function Main() {
   const [windowUpdated, setWindowUpdated] = useState(false);
   const [lockView, setLockView] = useState(false);
   const [openDetailsPreview, setOpenDetailsPreview] = useState(false);
+
+  //transition to slideshow state
+  const [openSlideShow, setOpenSlideShow] = useState(false);
+  const [removePoints, setRemovePoints] = useState(false);
+  const [showSlideShowControls, setShowSlideShowControls] = useState(false);
 
   //Functions for Utilities Buttons
   const showPath = useCallback(() => {
@@ -216,6 +222,8 @@ export default function Main() {
           buttonFocus={buttonFocus}
           setOpenDetailsPreview={setOpenDetailsPreview}
           openDetailsPreview={openDetailsPreview}
+          removePoints={removePoints}
+          setShowSlideShowControls={setShowSlideShowControls}
         />
       );
     });
@@ -229,6 +237,7 @@ export default function Main() {
         setScreenLock={setScreenLock}
         screenLock={screenLock}
         undoLastMove={undoLastMove}
+        setOpenSlideShow={setOpenSlideShow}
       />
       {openPointDetails ? (
         <PointDetails
@@ -248,6 +257,8 @@ export default function Main() {
         windowUpdated={windowUpdated}
         renderPaths={renderPaths}
         setButtonFocus={setButtonFocus}
+        openSlideShow={openSlideShow}
+        setRemovePoints={setRemovePoints}
       />
       <DetailsPreview
         point={points[movingPoint]}
@@ -261,6 +272,9 @@ export default function Main() {
         lockView={lockView}
       />
       {renderPoints()}
+      {showSlideShowControls ? (
+        <SlideshowControls points={points} canvasX={canvasX} />
+      ) : null}
     </div>
   );
 }

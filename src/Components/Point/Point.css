@@ -6,9 +6,8 @@
   border: none;
   margin-top: -10px;
   margin-left: -10px;
-  transition: all 0.5s linear;
   outline: none;
-  backface-visibility: hidden;
+  backface-visibility: initial;
 }
 
 .point_main:active,

@@ -9,6 +9,7 @@ export default function Utilities(props) {
       <button onClick={() => props.setScreenLock(!props.screenLock)}>
         Disable Add Points
       </button>
+      <button onClick={() => props.setOpenSlideShow(true)}>Slideshow</button>
     </div>
   );
 }
